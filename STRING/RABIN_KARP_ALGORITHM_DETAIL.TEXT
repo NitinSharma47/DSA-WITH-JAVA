@@ -1,0 +1,81 @@
+Karp-Rabin String Matching Algorithm*  -> It is a string pattern-matching algorithm used to find a pattern/Substring inside a String.
+
+*The Problem*
+You are given two strings: String A (the pattern you are looking for) and String B (the text you are searching inside). 
+The goal is to find whether String A exists as a subset or substring within String B. 
+
+Time Complexity Considerations*
+*   Naive Approach:- The traditional way to solve this is to search for the pattern of length A at every single starting position in B.
+     This results in a *quadratic time complexity of O(N \times M) (where N and M are the lengths of the two strings).
+
+*   Karp-Rabin Algorithm:- By using a hashing technique, this algorithm allows you to search for the string in **linear time, O(N + M).
+
+          1.    FORMULA TO MAKE HASHCODE OF A PATTERN/STRING =   **(s[0] × p^(m-1) + s[1] × p^(m-2) + ...+ s[m-1] × p^(0) ) % mod **
+
+explain ->              we intial the intial code for every character[A-Z] as [1-26]..
+                        So, s[0] means the initial code for first character of pattern...till the current window/pattern length
+                        (p) is the constant variable , which we can take 10 (for easier calculation) & it is going with reverse
+                                 of power of the length [ p^(m-2)...p^0 ] of pattern which we have to match..
+                        mod % is used generally to prevent overflow (when the hashcode goes behind the capacity of data types like int)
+                                    So, to prevent that we take modulous of the code
+                        u can take mod as (101 or 1_000_000_007)
+
+                EXAMPLE ->  String = "ABCCDDAEFG" , pattern = "CDDA"
+                    ->      so, m = 4 , p = 10 
+                            Initial Codes For Characters -> [A = 1 , B = 2 , C = 3 , D = 4 ,......Z = 26]
+
+                            formula for first window is ->  ( 1*10^3 + 2*10^2 + 3*10^1 + 3*10^0 ) % mod
+                            then, the result hashcode is compared with the hashcode of pattern(CDDA , which you can find in same way)
+                            if HASHCODE Matches , then the characters are checked , and if they are matched too .. Hurrahh ! the pattern exists 
+                            else, Rolling hash function is done & the window moves to next index
+                        
+          2.    ROLLING HASH FORMULA  =>   newHash = **(oldHash - oldChar × p^(m-1)) × p + newChar **
+
+                        Used when the pattern hashcode is not matched with the current substring..So, to move to next window.. this is used
+                        Subtract the old character's initial code with its p value(which can be only p^m-1 because it is the first character of window)
+                        Then, Multiply by constant p , becuase the after removing old charcter, the other nect character will become the preedecors(goes to left)
+                                    So, to maintain the Base formula , * p
+                        Then , add the new character's intital code..
+
+                EXAMPLE ->    Current Window = ABCC 
+                              New window -> BCCD 
+
+                              Computing HashCode for New Window ->
+                              ( HashCode(ABCC) - 1 * 10^3 ) * 10 + 4 
+
+
+
+*How the Algorithm Works*       ->>\
+
+1.  *Calculate Initial Hashes:* The algorithm compares the hash value of the pattern (String A) with the hash value of a
+     "window" or substring of String B that is exactly the same length as String A.
+2.  *Rolling Hash:* Instead of recalculating the entire hash from scratch every time the window moves one character to the right, 
+    it uses a *rolling hash function**. This updates the hash in *constant time O(1) by simply deleting the value of the previous character 
+    that is at left of the window and adding the value of the new character that entered the window.
+3.  *Handling Hash Collisions:* If the hash of the pattern matches the hash of the current window, it might be a match. 
+    However, multiple different strings can potentially have the same hash value (Which leads to a HASH COLLISION). 
+4.  *Character Verification:* To handle these false positives, whenever the hashes match, you must explicitly check every character of the substring 
+    against the pattern. If all characters match, then yeeee (: the pattern is found; if they do not match, it is just a collision
+    (which is known as SPURIOUS HITS)..
+5.  *Worst Case Scenario:* While the expected time is linear, the worst-case scenario can still be O(N \times M) if there are a massive number 
+    of hash collisions causing the algorithm to manually check characters at every step.        (THIS IS THE SINGLE DRAWBACK OF THIS ALGORITHM)
+
+*Dry Run of the Algorithm*
+
+*Example Strings:*
+*   *String A (Pattern): "Kunal" (length = 5)
+*   *String B (Text): "ApoorvKunalRahul"
+
+*Execution Steps:*
+1.  Calculate the hash for the pattern `"Kunal"`.
+2.  Calculate the hash for the first 5-character window in String B: "Apoor" (Indices 0 to 4). 
+3.  Compare the hash of "Kunal" with the hash of "Apoor". They are not equal.
+
+4.  *Slide the window by 1:* The window moves to the next 5 characters: "poorv" 
+    *   Instead of recalculating, use the rolling hash: Subtract the old character 'A' , divide by the prime, and *add the new character 'v'
+5.  Continue sliding the window and updating the hash in constant time.
+6.  Eventually, the window reaches index 6, where the substring is exactly "Kunal".
+7.  The hash of the current window will exactly match the hash of the pattern "Kunal".
+8.  Because the hashes match, the algorithm checks the strings character by character to ensure it is not a collision. They match perfectly.
+9.  The algorithm prints that the pattern was **found at index 6**.             <-      OUTPUT
+

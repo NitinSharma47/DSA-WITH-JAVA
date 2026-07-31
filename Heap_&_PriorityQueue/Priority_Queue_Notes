@@ -1,0 +1,110 @@
+* Priority Queue ->
+
+A Priority Queue is a special type of queue where elements are removed/processed according to their priority, rather than simply following FIFO 
+
+In a normal queue: Insert: 10, 20, 30, 40
+Queue: 10 → 20 → 30 → 40
+
+Remove → 10.. The first element inserted is removed first.
+
+Priority Queue ->
+
+* In a priority queue: 
+Insert: 10, 5, 30, 2
+Priority: 2 > 5 > 10 > 30
+
+if Remove → Then 2 remove first ....Then -> 5 , 10 , 30
+Remove → 5
+Remove → 10
+Remove → 30
+
+So: Priority Queue removes the element with the highest priority first.
+
+******************************************************************************************************************************************************
+1. Important Terminology
+
+You should know these terms for interviews.
+
+*         Term	                                                    Meaning
+                                            
+        Priority Queue	                                Queue where processing depends on priority
+        Priority	                                    Importance assigned to an element
+        Highest Priority	                            Element processed first
+        Min Priority Queue	                            Smallest value has highest priority
+        Max Priority Queue	                            Largest value has highest priority
+        Heap	                                        Most commonly used data structure to implement Priority Queue
+        Enqueue	                                        Insert element
+        Dequeue	                                        Remove highest-priority element
+        Peek	                                        View highest-priority element without removing
+
+2. Types of Priority Queue
+
+There are mainly two types you'll use in DSA.
+
+*   A. Min Priority Queue =  The smallest element has the highest priority.
+
+    Example: 
+    Elements: 10, 5, 20, 2, 8
+
+    Priority order: 2 > 5 > 8 > 10 > 20                 **  ( SMALLEST TO BIGGEST )
+    Removal order:  2 → 5 → 8 → 10 → 20
+
+*   B. Max Priority Queue = The largest element has the highest priority.
+
+    Elements: 10, 5, 20, 2, 8
+
+    Priority order: 20 > 10 > 8 > 5 > 2                  **  ( BIGGEST TO SMALLEST )
+
+    Removal order:  20 → 10 → 8 → 5 → 2
+******************************************************************************************************************************************************
+
+3. How Is Priority Queue Implemented?
+A Priority Queue can theoretically be implemented using:    Array , Linked List , Binary Heap , BST etc.
+
+*   But the most important implementation is Heap.  Priority Queue is generally implemented using a Heap.
+
+
+
+* 4. Heap and Priority Queue Relationship ->
+
+    Heap:   A Heap is a data structure.
+    Priority Queue: A Priority Queue is an abstract data type that describes the behavior we want.
+
+*   A heap is commonly used to implement that behavior efficiently.
+
+            For example:
+
+            Priority Queue
+                ↓
+            implemented using
+                ↓
+                Heap
+
+8.  Why Heap?
+
+Suppose we have:    10, 5, 20, 2, 8
+If we store everything in an ordinary array and want the smallest element:
+
+-   Option 1    Search the entire array:  O(n)
+-   Option 2    Sort the array:           O(n log n)
+
+*   But a Heap allows us to efficiently maintain the highest-priority element.
+        For a binary heap:
+
+        Operation	            Complexity
+          Peek	                    O(1)
+          Insert	                O(log n)
+          Remove	                O(log n)
+          Build heap	            O(n)
+
+    This is why heaps are so useful for Priority Queues.
+******************************************************************************************************************************************************
+
+9.  Priority Queue Operations ->
+
+    There are three important operations.
+-    insert():  Adds an element  ->        PQ.insert(10)
+-    peek():    Returns highest-priority element without removing it.   ->        PQ.peek()
+-    remove():  Removes the highest-priority element.                   ->        PQ.remove()
+
+*  WE ARE NOT DOING ANY IMPLEMENTATION OF PRIORITY QUEUE , BECAUSE IT IS SAME AS HEAP (MAX/MIN) , SO WE CAN LEARN IT THERE

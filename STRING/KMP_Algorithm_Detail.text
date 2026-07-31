@@ -1,0 +1,340 @@
+The KMP (Knuth-Morris-Pratt) algorithm is an efficient algorithm used to find a pattern string inside a text string.
+
+The Knuth-Morris-Pratt (KMP) algorithm is an efficient string pattern matching algorithm that searches for occurrences of a pattern 
+within a text in O(N + M) time. It preprocesses the pattern and constructs an LPS (Longest Proper Prefix which is also Suffix) array. 
+When a mismatch occurs, instead of restarting the pattern comparison from the beginning, 
+KMP uses the LPS array to determine the next possible position of the pattern. The text pointer never moves backward, making the algorithm efficient.
+
+-> KMP finds where the pattern occurs in the text without repeatedly comparing characters that we have already matched.
+
+1. What is String Matching?
+Suppose:
+Text = "ABABDABACDABABCABAB"
+Pattern = "ABABCABAB"
+
+We want to find:  -> 
+Does Pattern exist inside Text?
+If yes, at which index?
+
+The naive approach tries matching the pattern from every possible position.
+
+Naive Approach -> 
+Text:    A B A B D A B A C D A B A B C A B A B
+Pattern: A B A B C A B A B
+
+We start matching:
+A B A B D
+A B A B C
+        ↑ mismatch
+
+Now the naive algorithm shifts the pattern by one position and starts comparing again from starting of text 
+This can cause many repeated comparisons.
+
+Time Complexity -> O(N × M)  - Where: N = length of text , M = length of pattern
+
+** 2. Main Idea of KMP = KMP avoids unnecessary comparisons by using information about the pattern itself.  **          // 
+
+The main question is:
+When a mismatch occurs, how much of the already matched pattern can we reuse?
+
+For example:
+Pattern = ABABC
+
+Suppose we matched:- A B A B
+Then the next character mismatches.
+
+Instead of starting from the beginning, we ask: Does "ABAB" contain a prefix that is also a suffix?
+
+Prefixes:
+A
+AB
+ABA
+ABAB
+
+Suffixes:
+B
+AB
+BAB
+
+The longest common prefix and suffix is: AB
+So we already know that: AB is matched. Therefore, we do not need to compare those characters again.
+This is the core idea of KMP.
+
+3. KMP Uses the LPS Array                                                                                           //
+
+KMP preprocesses the pattern and creates an array called: LPS
+LPS = Longest Proper Prefix which is also Suffix
+
+Let's break this down.
+Prefix : A prefix is a substring starting from the beginning =  For: ABABC
+
+Prefixes are:
+A
+AB
+ABA
+ABAB
+ABABC
+
+Suffix : A suffix is a substring ending at the end = For: ABABC
+
+Suffixes are:
+C
+BC
+ABC
+BABC
+ABABC
+
+Proper Prefix : A proper prefix cannot be the entire string itself = So for: ABABC
+ABABC is not considered a proper prefix.
+
+4. Example of LPS ------------------------------------------------------------------------------------------------------------------------------------
+
+Consider: Pattern = ABABCABAB . 
+We calculate the LPS value for every index.
+
+Index:    0 1 2 3 4 5 6 7 8
+Pattern:  A B A B C A B A B
+LPS:      0 0 1 2 0 1 2 3 4
+
+Let's understand each position. ->
+
+Index 0 - Substring: A
+There is no proper prefix and suffix - So, LPS[0] = 0
+
+Moving to Index 1, Substring: AB
+Prefixes: A , Suffixes: B
+No match.
+LPS[1] = 0
+
+Index 2 - Substring: ABA
+Prefixes: A ,AB        Suffixes: A, BA
+Longest Match: A
+Therefore: LPS[2] = 1
+
+Index 3 - Substring: ABAB
+Prefixes: A, AB, ABA          Suffixes: B,AB,BAB
+Longest match: AB
+Therefore: LPS[3] = 2
+
+Index 4 - Substring: ABABC
+Prefixes: A,AB,ABA,ABAB      Suffixes: C,BC,ABC,BABC
+No match.
+LPS[4] = 0
+
+Index 5 - Substring: ABABCA
+prefixES: A,AB,ABA,ABAB,ABABC          Suffixes: A,CA,BCA,ABCA,BABCA
+Match  : A
+Therefore: LPS[5] = 1
+
+Index 6 - Substring: ABABCAB
+Prefixes: A,AB,ABA,ABAB,ABABC,ABABCA              Suffixes : B,AB,CAB,BCAB,ABCAB,BABCAB
+Longest Match: AB
+Therefore: LPS[6] = 2
+
+Index 7 - Substring: ABABCABA                                                       
+Longest matching prefix and suffix: ABA                                                         // same procedure as above 
+Therefore: LPS[7] = 3
+Index 8
+
+Substring: ABABCABAB                        //  FINAL SUBSTRING
+Longest matching prefix and suffix: ABAB
+Therefore: LPS[8] = 4
+
+5. Important Meaning of LPS ->              //
+Suppose: Pattern = ABABCABAB
+And: LPS[8] = 4
+This means:-      ABAB is both:   Prefix of the pattern , Suffix of the pattern
+
+Therefore, after matching 9 characters and getting a mismatch, we can continue from: j = 4
+instead of: j = 0
+
+This is how KMP skips unnecessary comparisons.
+
+6. How to Build the LPS Array ->                // ---------------------------------------------------------------------------------------------------
+We use two pointers:                i & len         // len works as a pointer(to compare characters in Pattern) 
+                                                            and as well as used to store the longest prefix suffix match
+
+Initially: i = 1 , len = 0
+
+Why does i start at 1?
+Because: LPS[0] = 0 always.
+
+Basic Logic
+if pattern[i] == pattern[len]:
+
+    len++
+    lps[i] = len            //strore the match value in array for that pattern index
+    i++
+
+else:
+    if len != 0:
+        len = lps[len - 1]              // if not match then fall back to last matching index
+
+    else:
+        lps[i] = 0
+        i++
+
+The most important line is: len = lps[len - 1]
+            ** This allows us to fall back to a smaller prefix without moving i backward. ** 
+
+7. LPS Construction Example --------------------------------------------------------------------------------------------------------------------------
+Pattern: A B A B C A B A B
+
+Let's calculate.
+Initial
+
+i = 1
+len = 0
+Compare:
+pattern[1] = B
+pattern[0] = A
+Mismatch.
+
+Since:
+len == 0
+we set:
+lps[1] = 0
+i++
+
+i = 2
+Compare:
+pattern[2] = A
+pattern[0] = A
+Match.
+
+len = 1
+lps[2] = 1
+i = 3
+i = 3
+
+Compare:
+pattern[3] = B
+pattern[1] = B
+Match.
+
+len = 2
+lps[3] = 2
+i = 4
+
+Compare:
+pattern[4] = C
+pattern[2] = A
+Mismatch.
+
+Now: len != 0
+So:
+len = lps[len - 1]
+len = lps[1]
+len = 0
+
+Notice:
+i is still 4 , We do not move i backward.
+
+Now compare:
+pattern[4] = C
+pattern[0] = A
+Mismatch again.
+
+Now:
+len == 0
+Therefore:
+lps[4] = 0
+i++
+
+This is the key optimization.
+
+9. KMP Searching Process                                // process start for string matching----------------------------------------------------------
+Now we search for the pattern in the text.
+
+We use two pointers:
+i = index of text
+j = index of pattern
+
+Initially:
+i = 0
+j = 0
+
+Case 1: Characters Match
+If:
+text[i] == pattern[j]
+Then:
+i++
+j++
+
+If:
+j == pattern.length()
+then the pattern is found
+Starting index: i - j
+
+Case 2: Mismatch and j != 0
+If: text[i] != pattern[j] 
+and: j != 0
+
+Then:
+j = lps[j - 1];
+
+Important: i does not move
+We compare the same text character with the new pattern character.
+
+Case 3: Mismatch and j == 0
+If: text[i] != pattern[j]
+and: j == 0
+
+Then:
+i++;
+
+11. Complete Dry Run
+
+Consider:
+
+Text =    ABABDABACDABABCABAB
+Pattern = ABABCABAB
+
+LPS:
+
+Pattern: A B A B C A B A B
+LPS:     0 0 1 2 0 1 2 3 4
+
+We start:
+
+i = 0
+j = 0
+Matching
+Text:    A B A B D
+Pattern: A B A B C
+
+Comparisons:
+
+A == A
+B == B
+A == A
+B == B
+D != C
+
+At this point:
+j = 4
+
+Mismatch.
+Instead of doing : j = 0
+
+we do:
+j = lps[j - 1]
+j = lps[3]
+j = 2
+So:j = 2
+
+The text pointer remains at: i = 4
+
+// And so on same procedure of next characters--------------------------------------------------------------------------------------------------------
+
+15. Time Complexity
+
+Let:
+N = length of text
+M = length of pattern
+LPS Construction - O(M)
+Searching - O(N)
+Total = O(N + M)
+
+- Space Complexity
+LPS array = O(M)
